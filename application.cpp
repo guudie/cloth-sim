@@ -1,4 +1,5 @@
 #include "application.h"
+#include "renderer.h"
 
 void application::setup(int clothWidth, int clothHeight, int clothSpacing) {
     _renderer = new renderer();
