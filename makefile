@@ -24,5 +24,5 @@ renderer.o: renderer.h renderer.cpp
 main.o: main.cpp application.h renderer.h ./ODE_solvers/velocityVerlet.h ./ODE_solvers/ODESolver.h
 	$(GCC) $(ARGS) -c main.cpp -o main.o
 
-app: main.o renderer.o ./ODE_solvers/velocityVerlet.o
-	$(GCC) -o app main.o renderer.o ./ODE_solvers/ODESolver.o ./ODE_solvers/velocityVerlet.o $(CFLAGS)
+app: main.o renderer.o ./ODE_solvers/ode_joined.o
+	$(GCC) -o $@ $^ $(CFLAGS)

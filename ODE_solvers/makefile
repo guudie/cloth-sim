@@ -1,17 +1,22 @@
 .PHONY: all clean
 
-ARGS = -O2
+ARGS = -O2 -Wall
 GCC = g++
+LD = ld
+LDFLAGS = -r -O2
 
-all: ODESolver.o velocityVerlet.o verlet.o
+all: ODESolver.o velocityVerlet.o verlet.o ode_joined.o
 clean:
 	-rm *.o
 
 ODESolver.o: ODESolver.h ODESolver.cpp
 	$(GCC) $(ARGS) -c ODESolver.cpp -o ODESolver.o
 
-velocityVerlet.o: ODESolver.o velocityVerlet.h velocityVerlet.cpp
+velocityVerlet.o: ODESolver.h velocityVerlet.h velocityVerlet.cpp
 	$(GCC) $(ARGS) -c velocityVerlet.cpp -o velocityVerlet.o
 
-verlet.o: ODESolver.o verlet.h verlet.cpp
+verlet.o: ODESolver.h verlet.h verlet.cpp
 	$(GCC) $(ARGS) -c verlet.cpp -o verlet.o
+
+ode_joined.o: ODESolver.o velocityVerlet.o
+	$(LD) $(LDFLAGS) ODESolver.o velocityVerlet.o -o ode_joined.o
