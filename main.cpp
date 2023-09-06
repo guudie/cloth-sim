@@ -30,7 +30,7 @@ static void parseData(const std::string& path, std::vector<point>& points, std::
             glm::vec2 p;
             bool locked;
             fin >> p.x >> p.y >> locked;
-            points.push_back({ p, glm::vec2((rand() % 11) * (!locked), 0), glm::vec2(0, 0.1f * (!locked)), locked });
+            points.push_back({ p, glm::vec2((rand() % 21) * (!locked), 0), glm::vec2(0, 0.2f * (!locked)), locked });
             if(x > 0) {
                 glm::vec2 tmp = points[y * c + x - 1].pos;
                 sticks.push_back({ y * c + x, y * c + x - 1, glm::length(p - tmp) });
@@ -89,6 +89,9 @@ inline static void constrainLength(point* p, point* q, const float& len, const f
         q = tmp;
     }
     
+    if(glm::length(q->pos - p->pos) < 1e-3) [[unlikely]] {
+        q->pos += glm::vec2(1, 0);
+    }
     glm::vec2 seg = q->pos - p->pos;
     float actuallen = glm::length(seg);
     if(actuallen > len + elasticity) {
@@ -123,7 +126,7 @@ int main(int argv, char** args) {
     std::vector<segment> sticks;
     parseData("data.txt", points, sticks);
 
-    float elasticity = 4.0f;
+    float elasticity = 2.0f;
     float drag = 0.01f;
 
     velocityVerlet _integrator = velocityVerlet([=](float t, glm::vec2 y, glm::vec2 z, glm::vec2 zdash) -> glm::vec2 {
@@ -146,9 +149,7 @@ int main(int argv, char** args) {
 
         for(int i = 0; i < 3; i++) {
             for(const auto& stick : sticks) {
-                point& p = points[stick.p];
-                point& q = points[stick.q];
-                constrainLength(&p, &q, stick.len, elasticity);
+                constrainLength(&points[stick.p], &points[stick.q], stick.len, elasticity);
             }
             for(auto& p : points)
                 resolveOutOfBounds(p, width, height);
