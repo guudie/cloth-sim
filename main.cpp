@@ -112,13 +112,15 @@ int main(int argv, char** args) {
     std::vector<segment> sticks;
     parseData("data.txt", points, sticks);
 
+    float elasticity = 10.0f;
+    float drag = 0.01f;
+
     velocityVerlet _integrator = velocityVerlet([=](float t, glm::vec2 y, glm::vec2 z, glm::vec2 zdash) -> glm::vec2 {
         if(y.y > height - 10 - 3 && abs(z.x) > 0)
             zdash.x = -glm::sign(z).x * 0.1f;
+        zdash -= glm::dot(z, z) > 1e-3 ? glm::normalize(z) * drag : glm::vec2(0, 0);
         return zdash;
     });
-
-    float elasticity = 10.0f;
 
     while(running) {
         handleQuit(running);
