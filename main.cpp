@@ -28,8 +28,9 @@ static void parseData(const std::string& path, std::vector<point>& points, std::
     for(int y = 0; y < r; y++) {
         for(int x = 0; x < c; x++) {
             glm::vec2 p;
-            fin >> p.x >> p.y;
-            points.push_back({ p, glm::vec2((rand() % 11) * (y != 0), 0), glm::vec2(0, 0.1f * (y != 0)), y == 0 });
+            bool locked;
+            fin >> p.x >> p.y >> locked;
+            points.push_back({ p, glm::vec2((rand() % 11) * (!locked), 0), glm::vec2(0, 0.1f * (!locked)), locked });
             if(x > 0) {
                 glm::vec2 tmp = points[y * c + x - 1].pos;
                 sticks.push_back({ y * c + x, y * c + x - 1, glm::length(p - tmp) });
@@ -89,7 +90,17 @@ inline static void constrainLength(point* p, point* q, const float& len, const f
     }
     
     glm::vec2 seg = q->pos - p->pos;
-    seg = seg * (len / glm::length(seg) - 1.0f);
+    float actuallen = glm::length(seg);
+    if(actuallen > len + elasticity) {
+        seg *= (len + elasticity) / actuallen - 1.0f;
+        // actuallen = len + elasticity;
+    } else if(actuallen < len - elasticity) {
+        seg *= (len - elasticity) / actuallen - 1.0f;
+        // actuallen = len - elasticity;
+    } else {
+        // seg *= len / actuallen - 1.0f;
+        return;
+    }
     // now q needs to go along with seg in order to get the correct position
     if(!p->locked)
         seg *= 0.5f;
@@ -112,13 +123,14 @@ int main(int argv, char** args) {
     std::vector<segment> sticks;
     parseData("data.txt", points, sticks);
 
-    float elasticity = 10.0f;
+    float elasticity = 4.0f;
     float drag = 0.01f;
 
     velocityVerlet _integrator = velocityVerlet([=](float t, glm::vec2 y, glm::vec2 z, glm::vec2 zdash) -> glm::vec2 {
         if(y.y > height - 10 - 3 && abs(z.x) > 0)
             zdash.x = -glm::sign(z).x * 0.1f;
-        zdash -= glm::dot(z, z) > 1e-3 ? glm::normalize(z) * drag : glm::vec2(0, 0);
+        float zlen = glm::length(z);
+        zdash -= zlen > 1e-3 ? z * zlen * drag : glm::vec2(0, 0);
         return zdash;
     });
 
