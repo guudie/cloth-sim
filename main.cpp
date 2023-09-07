@@ -7,6 +7,7 @@
 #include <SDL2/SDL.h>
 // #include <SDL2/SDL_timer.h>
 #include "renderer.h"
+#include "mouse.h"
 #include "ODE_solvers/velocityVerlet.h"
 
 struct point {
@@ -17,39 +18,72 @@ struct point {
 };
 
 struct segment {
-    int p, q;
+    point *p_ptr, *q_ptr;
     float len;
 };
 
-static void parseData(const std::string& path, std::vector<point>& points, std::vector<segment>& sticks) {
+static void parseData(const std::string& path, std::vector<point*>& points, std::vector<segment*>& sticks) {
     std::fstream fin(path, std::ios::in);
     int r, c;
     fin >> r >> c;
     for(int y = 0; y < r; y++) {
         for(int x = 0; x < c; x++) {
-            glm::vec2 p;
+            float cx, cy;
             bool locked;
-            fin >> p.x >> p.y >> locked;
-            points.push_back({ p, glm::vec2((rand() % 21) * (!locked), 0), glm::vec2(0, 0.2f * (!locked)), locked });
+            fin >> cx >> cy >> locked;
+            point* p = new point { glm::vec2(cx, cy), glm::vec2((rand() % 21) * (!locked), 0), glm::vec2(0, 0.2f * (!locked)), locked };
+            points.push_back(p);
             if(x > 0) {
-                glm::vec2 tmp = points[y * c + x - 1].pos;
-                sticks.push_back({ y * c + x, y * c + x - 1, glm::length(p - tmp) });
+                point* tmp = points[y * c + x - 1];
+                sticks.push_back(new segment { p, tmp, glm::length(p->pos - tmp->pos) });
             }
             if(y > 0) {
-                glm::vec2 tmp = points[(y - 1) * c + x].pos;
-                sticks.push_back({ y * c + x, (y - 1) * c + x, glm::length(p - tmp) });
+                point* tmp = points[(y - 1) * c + x];
+                sticks.push_back(new segment { p, tmp, glm::length(p->pos - tmp->pos) });
             }
         }
     }
 }
 
-inline static void handleQuit(bool& running) {
+inline static void handleQuit(bool& running, mouse* _mouse) {
     SDL_Event event;
+    int x, y;
     while(SDL_PollEvent(&event)) {
         switch(event.type) {
-            case SDL_QUIT:
+        case SDL_QUIT:
+            running = false;
+            break;
+        case SDL_KEYDOWN:
+            if(event.key.keysym.sym == SDLK_ESCAPE)
                 running = false;
-                break;
+            break;
+        case SDL_MOUSEMOTION:
+            x = event.motion.x;
+            y = event.motion.y;
+            _mouse->updatePos(x, y);
+            break;
+        case SDL_MOUSEBUTTONDOWN:
+            SDL_GetMouseState(&x, &y);
+            _mouse->updatePos(x, y);
+            if (!_mouse->getLB() && event.button.button == SDL_BUTTON_LEFT) 
+            {
+                _mouse->setLB(true);
+            }
+            if (!_mouse->getRB() && event.button.button == SDL_BUTTON_RIGHT) 
+            {
+                _mouse->setRB(true);
+            }
+            break;
+        case SDL_MOUSEBUTTONUP: 
+            if (_mouse->getLB() && event.button.button == SDL_BUTTON_LEFT)
+            {
+                _mouse->setLB(false);
+            }
+            if (_mouse->getRB() && event.button.button == SDL_BUTTON_RIGHT)
+            {
+                _mouse->setRB(false);
+            }
+            break;
         }
     }
 }
@@ -84,9 +118,7 @@ inline static void constrainLength(point* p, point* q, const float& len, const f
     if(p->locked && q->locked)
         return;
     if(q->locked) {
-        point* tmp = p;
-        p = q;
-        q = tmp;
+        std::swap(p, q);
     }
     
     if(glm::length(q->pos - p->pos) < 1e-3) [[unlikely]] {
@@ -122,8 +154,11 @@ int main(int argv, char** args) {
     renderer* _renderer = new renderer();
     bool running = _renderer->setup(width, height);
 
-    std::vector<point> points;
-    std::vector<segment> sticks;
+    mouse* _mouse = new mouse();
+    float radiussquared = 400.0f;
+
+    std::vector<point*> points;
+    std::vector<segment*> sticks;
     parseData("data.txt", points, sticks);
 
     float elasticity = 2.0f;
@@ -138,21 +173,30 @@ int main(int argv, char** args) {
     });
 
     while(running) {
-        handleQuit(running);
+        handleQuit(running, _mouse);
 
         _renderer->clearScreen(0xFF000816);
 
         for(auto& p : points) {
-            _integrator.Integrate(p.pos, p.vel, p.acc, 1);
+            _integrator.Integrate(p->pos, p->vel, p->acc, 1);
+            if(!_mouse->getLB())
+                continue;
+            if(!p->locked) {
+                glm::vec2 tmp = p->pos - _mouse->getPos();
+                if(glm::dot(tmp, tmp) < radiussquared) {
+                    p->pos += _mouse->getDiff();
+                    p->vel += _mouse->getDiff();
+                }
+            }
             // resolveVelocity(p.pos, p.vel, height);
         }
 
         for(int i = 0; i < 3; i++) {
             for(const auto& stick : sticks) {
-                constrainLength(&points[stick.p], &points[stick.q], stick.len, elasticity);
+                constrainLength(stick->p_ptr, stick->q_ptr, stick->len, elasticity);
             }
             for(auto& p : points)
-                resolveOutOfBounds(p, width, height);
+                resolveOutOfBounds(*p, width, height);
         }
 
         // for(const auto& stick : sticks) {
@@ -166,7 +210,7 @@ int main(int argv, char** args) {
         // }
 
         for(const auto& stick : sticks)
-            _renderer->drawLine(points[stick.p].pos, points[stick.q].pos, 0xFFFFFFFF);
+            _renderer->drawLine(stick->p_ptr->pos, stick->q_ptr->pos, 0xFFFFFFFF);
 
         _renderer->render();
 
@@ -175,7 +219,12 @@ int main(int argv, char** args) {
 
     std::cout << "Quit program" << std::endl;
 
+    for(auto& p : points)
+        delete p;
+    for(auto& stick : sticks)
+        delete stick;
     delete _renderer;
+    delete _mouse;
 
     return 0;
 }
