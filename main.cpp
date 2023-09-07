@@ -31,7 +31,7 @@ static void parseData(const std::string& path, std::vector<point*>& points, std:
             float cx, cy;
             bool locked;
             fin >> cx >> cy >> locked;
-            point* p = new point { glm::vec2(cx, cy), glm::vec2((rand() % 21) * (!locked), 0), glm::vec2(0, 0.4f * (!locked)), locked };
+            point* p = new point { glm::vec2(cx, cy), glm::vec2((rand() % 21) * (!locked), 0), glm::vec2(0, 0.5f * (!locked)), locked };
             points.push_back(p);
             if(x > 0) {
                 point* tmp = points[y * c + x - 1];
@@ -214,7 +214,7 @@ int main(int argv, char** args) {
         for(auto& stick : sticks) {
             if(stick == nullptr)
                 continue;
-            if(_mouse->getRB()) {
+            if(_mouse->getRB()) [[unlikely]] {
                 glm::vec2 tmp = (stick->p_ptr->pos + stick->q_ptr->pos) / 2.0f - _mouse->getPos();
                 if(glm::dot(tmp, tmp) < radiussquared / 16.0f) {
                     delete stick;
