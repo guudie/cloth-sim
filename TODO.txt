@@ -1,3 +1,6 @@
 [✓] add the 'cutting' interaction
 [ ] add the 'pinch and drag' interaction in addition to 'run finger across'
 [ ] implement springiness
+
+## not important
+[ ] implement velocity cap

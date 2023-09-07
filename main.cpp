@@ -122,7 +122,7 @@ inline static void constrainLength(point* p, point* q, const float& len, const f
     }
     
     if(glm::length(q->pos - p->pos) < 1e-3) [[unlikely]] {
-        q->pos += glm::vec2(1, 0);
+        q->pos.x += 1.0f;
     }
     glm::vec2 seg = q->pos - p->pos;
     float actuallen = glm::length(seg);
@@ -163,14 +163,20 @@ int main(int argv, char** args) {
 
     float elasticity = 2.0f;
     float drag = 0.01f;
+    float dragCap = 10.0f;
 
     velocityVerlet _integrator = velocityVerlet([=](float t, glm::vec2 y, glm::vec2 z, glm::vec2 zdash) -> glm::vec2 {
         if(y.y > height - 10 - 3 && abs(z.x) > 0)
             zdash.x = -glm::sign(z).x * 0.1f;
         float zlen = glm::length(z);
-        zdash -= zlen > 1e-3 ? z * zlen * drag : glm::vec2(0, 0);
+        if(zlen > 1e-3) {
+            z *= (zlen * zlen * drag > dragCap) ? dragCap / zlen : zlen * drag;
+            zdash -= z;
+        }
         return zdash;
     });
+
+    // point* followMouse = nullptr;
 
     while(running) {
         handleQuit(running, _mouse);
@@ -178,15 +184,28 @@ int main(int argv, char** args) {
         _renderer->clearScreen(0xFF000816);
 
         for(auto& p : points) {
+            // if(p == followMouse) {
+            //     if(!_mouse->getLB()) {
+            //         followMouse = nullptr;
+            //         p->locked = false;
+            //         p->acc = { 0, 0.5f };
+            //     } else {
+            //         p->pos = _mouse->getPos();
+            //     }
+            // }
             if(p->locked)
                 continue;
             _integrator.Integrate(p->pos, p->vel, p->acc, 1);
-            if(!_mouse->getLB())
+            if(!_mouse->getLB() /* || followMouse != nullptr */)
                 continue;
             glm::vec2 tmp = p->pos - _mouse->getPos();
             if(glm::dot(tmp, tmp) < radiussquared) {
                 p->pos += _mouse->getDiff();
                 p->vel += _mouse->getDiff();
+                // p->locked = true;
+                // p->vel = { 0, 0 };
+                // p->acc = { 0, 0 };
+                // followMouse = p;
             }
             // resolveVelocity(p.pos, p.vel, height);
         }
