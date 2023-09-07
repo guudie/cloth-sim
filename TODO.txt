@@ -1,3 +1,3 @@
-[ ] add the 'cutting' interaction
-[ ] add the 'pinch and drag' interaction in addition to 'drag finger across'
+[✓] add the 'cutting' interaction
+[ ] add the 'pinch and drag' interaction in addition to 'run finger across'
 [ ] implement springiness

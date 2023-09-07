@@ -31,7 +31,7 @@ static void parseData(const std::string& path, std::vector<point*>& points, std:
             float cx, cy;
             bool locked;
             fin >> cx >> cy >> locked;
-            point* p = new point { glm::vec2(cx, cy), glm::vec2((rand() % 21) * (!locked), 0), glm::vec2(0, 0.2f * (!locked)), locked };
+            point* p = new point { glm::vec2(cx, cy), glm::vec2((rand() % 21) * (!locked), 0), glm::vec2(0, 0.4f * (!locked)), locked };
             points.push_back(p);
             if(x > 0) {
                 point* tmp = points[y * c + x - 1];
@@ -178,21 +178,23 @@ int main(int argv, char** args) {
         _renderer->clearScreen(0xFF000816);
 
         for(auto& p : points) {
+            if(p->locked)
+                continue;
             _integrator.Integrate(p->pos, p->vel, p->acc, 1);
             if(!_mouse->getLB())
                 continue;
-            if(!p->locked) {
-                glm::vec2 tmp = p->pos - _mouse->getPos();
-                if(glm::dot(tmp, tmp) < radiussquared) {
-                    p->pos += _mouse->getDiff();
-                    p->vel += _mouse->getDiff();
-                }
+            glm::vec2 tmp = p->pos - _mouse->getPos();
+            if(glm::dot(tmp, tmp) < radiussquared) {
+                p->pos += _mouse->getDiff();
+                p->vel += _mouse->getDiff();
             }
             // resolveVelocity(p.pos, p.vel, height);
         }
 
         for(int i = 0; i < 3; i++) {
             for(const auto& stick : sticks) {
+                if(stick == nullptr)
+                    continue;
                 constrainLength(stick->p_ptr, stick->q_ptr, stick->len, elasticity);
             }
             for(auto& p : points)
@@ -209,8 +211,19 @@ int main(int argv, char** args) {
         //     }
         // }
 
-        for(const auto& stick : sticks)
+        for(auto& stick : sticks) {
+            if(stick == nullptr)
+                continue;
+            if(_mouse->getRB()) {
+                glm::vec2 tmp = (stick->p_ptr->pos + stick->q_ptr->pos) / 2.0f - _mouse->getPos();
+                if(glm::dot(tmp, tmp) < radiussquared / 16.0f) {
+                    delete stick;
+                    stick = nullptr;
+                    continue;
+                }
+            }
             _renderer->drawLine(stick->p_ptr->pos, stick->q_ptr->pos, 0xFFFFFFFF);
+        }
 
         _renderer->render();
 
@@ -222,7 +235,8 @@ int main(int argv, char** args) {
     for(auto& p : points)
         delete p;
     for(auto& stick : sticks)
-        delete stick;
+        if(stick != nullptr)
+            delete stick;
     delete _renderer;
     delete _mouse;
 
