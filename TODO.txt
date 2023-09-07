@@ -1,0 +1,3 @@
+[ ] add the 'cutting' interaction
+[ ] add the 'pinch and drag' interaction in addition to 'drag finger across'
+[ ] implement springiness
