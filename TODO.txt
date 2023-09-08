@@ -1,5 +1,6 @@
 [✓] add the 'cutting' interaction
-[ ] add the 'pinch and drag' interaction in addition to 'run finger across'
+[o] add the 'pinch and drag' interaction in addition to 'run finger across'
+    [ ] add misclick check
 [ ] implement springiness
 
 ## not important
