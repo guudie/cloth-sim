@@ -207,7 +207,7 @@ int main(int argv, char** args) {
                 // p->acc = { 0, 0 };
                 // followMouse = p;
             }
-            // resolveVelocity(p.pos, p.vel, height);
+            // resolveVelocity(p->pos, p->vel, height);
         }
 
         for(int i = 0; i < 3; i++) {
@@ -221,12 +221,10 @@ int main(int argv, char** args) {
         }
 
         // for(const auto& stick : sticks) {
-        //     point& p = points[stick.p];
-        //     point& q = points[stick.q];
         //     for(int i = 0; i < 3; i++) {
-        //         constrainLength(&p, &q, stick.len, elasticity);
-        //         resolveOutOfBounds(p, width, height);
-        //         resolveOutOfBounds(q, width, height);
+        //         constrainLength(stick->p_ptr, stick->q_ptr, stick->len, elasticity);
+        //         resolveOutOfBounds(*stick->p_ptr, width, height);
+        //         resolveOutOfBounds(*stick->q_ptr, width, height);
         //     }
         // }
 
