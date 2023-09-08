@@ -188,6 +188,7 @@ int main(int argv, char** args) {
             //     if(!_mouse->getLB()) {
             //         followMouse = nullptr;
             //         p->locked = false;
+            //         p->vel = _mouse->getDiff();
             //         p->acc = { 0, 0.5f };
             //     } else {
             //         p->pos = _mouse->getPos();
@@ -221,6 +222,8 @@ int main(int argv, char** args) {
         }
 
         // for(const auto& stick : sticks) {
+        //     if(stick == nullptr)
+        //         continue;
         //     for(int i = 0; i < 3; i++) {
         //         constrainLength(stick->p_ptr, stick->q_ptr, stick->len, elasticity);
         //         resolveOutOfBounds(*stick->p_ptr, width, height);
