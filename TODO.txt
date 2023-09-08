@@ -1,6 +1,7 @@
 [✓] add the 'cutting' interaction
 [o] add the 'pinch and drag' interaction in addition to 'run finger across'
     [ ] add misclick check
+    [ ] implement 'pick the closest point'
 [ ] implement springiness
 
 ## not important
