@@ -211,6 +211,9 @@ int main(int argv, char** args) {
             // resolveVelocity(p->pos, p->vel, height);
         }
 
+        // if(_mouse->getLB() && followMouse == nullptr)
+        //     _mouse->setLB(false);
+
         for(int i = 0; i < 3; i++) {
             for(const auto& stick : sticks) {
                 if(stick == nullptr)
