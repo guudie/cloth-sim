@@ -5,4 +5,4 @@
 [ ] implement springiness
 
 ## not important
-[ ] implement velocity cap
+[o] implement velocity cap
