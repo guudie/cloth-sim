@@ -3,6 +3,7 @@
     [✓] add misclick check
     [ ] implement 'pick the closest point'
 [ ] implement springiness
+[ ] use ordered maps to store points and sticks instead of vectors
 
 ## not important
 [o] implement velocity cap

@@ -113,8 +113,7 @@ inline static void resolveVelocity(const glm::vec2& p, glm::vec2& v, const int& 
     if(abs(v.y) < 0.25f && p.y > height - 10 - 3)
         v.y = 0;
     float len = glm::length(v);
-    if(len > 100.0f)
-        v *= 100.0f / len;
+    v *= len > 100.0f ? 100.0f / len : 1;
 }
 
 inline static void constrainLength(point* p, point* q, const float& len, const float& elasticity) {
@@ -204,7 +203,7 @@ int main(int argv, char** args) {
             
             _integrator.Integrate(p->pos, p->vel, p->acc, 1);
             // resolveVelocity(p->pos, p->vel, height);
-            
+
             if(!_mouse->getLB() /* || followMouse != nullptr */)
                 continue;
             glm::vec2 tmp = p->pos - _mouse->getPos();
