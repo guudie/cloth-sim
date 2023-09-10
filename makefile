@@ -24,7 +24,7 @@ renderer.o: renderer.h renderer.cpp
 mouse.o: mouse.h mouse.cpp
 	$(GCC) $(ARGS) -c mouse.cpp -o mouse.o
 
-main.o: main.cpp application.h renderer.h mouse.h ./ODE_solvers/velocityVerlet.h ./ODE_solvers/ODESolver.h
+main.o: main.cpp application.h renderer.h mouse.h utils.h ./ODE_solvers/velocityVerlet.h ./ODE_solvers/ODESolver.h
 	$(GCC) $(ARGS) -c main.cpp -o main.o
 
 app: main.o renderer.o mouse.o ./ODE_solvers/ode_joined.o
