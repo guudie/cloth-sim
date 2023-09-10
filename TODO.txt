@@ -7,3 +7,4 @@
 
 ## not important
 [o] implement velocity cap
+[ ] implement concurrency
