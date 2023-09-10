@@ -8,9 +8,10 @@ private:
 
     bool leftButtonDown;
     bool rightButtonDown;
+    bool sideButtonX2Down;
 
 public:
-    mouse() : pos({0, 0}), prevPos({0, 0}), leftButtonDown(false), rightButtonDown(false) { }
+    mouse() : pos({0, 0}), prevPos({0, 0}), leftButtonDown(false), rightButtonDown(false), sideButtonX2Down(false) { }
     ~mouse() = default;
 
     const glm::vec2& getPos() const { return pos; }
@@ -24,4 +25,7 @@ public:
 
     bool getRB() const { return rightButtonDown; }
     void setRB(bool state) { rightButtonDown = state; }
+
+    bool getSBX2() const { return sideButtonX2Down; }
+    void setSBX2(bool state) { sideButtonX2Down = state; }
 };

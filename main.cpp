@@ -39,6 +39,10 @@ inline static void handleQuit(bool& running, mouse* _mouse) {
             {
                 _mouse->setRB(true);
             }
+            if (!_mouse->getSBX2() && event.button.button == SDL_BUTTON_X2) 
+            {
+                _mouse->setSBX2(true);
+            }
             break;
         case SDL_MOUSEBUTTONUP: 
             if (_mouse->getLB() && event.button.button == SDL_BUTTON_LEFT)
@@ -48,6 +52,10 @@ inline static void handleQuit(bool& running, mouse* _mouse) {
             if (_mouse->getRB() && event.button.button == SDL_BUTTON_RIGHT)
             {
                 _mouse->setRB(false);
+            }
+            if (_mouse->getSBX2() && event.button.button == SDL_BUTTON_X2) 
+            {
+                _mouse->setSBX2(false);
             }
             break;
         }
@@ -117,7 +125,7 @@ int main(int argv, char** args) {
         return zdash;
     });
 
-    // point* followMouse = nullptr;
+    point* followMouse = nullptr;
 
     while(running) {
         handleQuit(running, _mouse);
@@ -125,16 +133,16 @@ int main(int argv, char** args) {
         _renderer->clearScreen(0xFF000816);
 
         for(auto& p : points) {
-            // if(p == followMouse) {
-            //     if(!_mouse->getLB()) {
-            //         followMouse = nullptr;
-            //         p->locked = false;
-            //         p->vel = _mouse->getDiff();
-            //         p->acc = { 0, 0.5f };
-            //     } else {
-            //         p->pos = _mouse->getPos();
-            //     }
-            // }
+            if(p == followMouse) {
+                if(!_mouse->getLB()) {
+                    followMouse = nullptr;
+                    p->locked = false;
+                    p->vel = _mouse->getDiff();
+                    p->acc = { 0, 0.5f };
+                } else {
+                    p->pos = _mouse->getPos();
+                }
+            }
 
             if(p->locked)
                 continue;
@@ -142,21 +150,23 @@ int main(int argv, char** args) {
             _integrator.Integrate(p->pos, p->vel, p->acc, 1);
             // resolveVelocity(p->pos, p->vel, height);
 
-            if(!_mouse->getLB() /* || followMouse != nullptr */)
-                continue;
             glm::vec2 tmp = p->pos - _mouse->getPos();
-            if(glm::dot(tmp, tmp) < radiussquared) {
-                p->pos += _mouse->getDiff();
-                p->vel += _mouse->getDiff();
-                // p->locked = true;
-                // p->vel = { 0, 0 };
-                // p->acc = { 0, 0 };
-                // followMouse = p;
+            if(glm::dot(tmp, tmp) < radiussquared && followMouse == nullptr) {
+                if(_mouse->getLB()) {
+                    p->locked = true;
+                    p->vel = { 0, 0 };
+                    p->acc = { 0, 0 };
+                    followMouse = p;
+                } else if(_mouse->getSBX2()) {
+                    p->pos += _mouse->getDiff();
+                    p->vel += _mouse->getDiff();
+                }
             }
         }
 
-        // if(_mouse->getLB() && followMouse == nullptr)
-        //     _mouse->setLB(false);
+        if(_mouse->getLB() && followMouse == nullptr) {
+            _mouse->setLB(false);
+        }
 
         for(int i = 0; i < 3; i++) {
             for(const auto& stick : sticks) {
