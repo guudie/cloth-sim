@@ -5,7 +5,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <SDL2/SDL.h>
-// #include <SDL2/SDL_timer.h>
 #include "renderer.h"
 #include "mouse.h"
 #include "ODE_solvers/velocityVerlet.h"
@@ -207,7 +206,6 @@ int main(int argv, char** args) {
 
             _renderer->render();
 
-            // SDL_Delay(1000 / 60);
             lastUpd = curTime;
         }
     }
