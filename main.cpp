@@ -10,7 +10,7 @@
 #include "ODE_solvers/velocityVerlet.h"
 #include "utils.h"
 
-inline static void handleQuit(bool& running, mouse* _mouse) {
+inline static void handleInput(bool& running, mouse* _mouse) {
     SDL_Event event;
     int x, y;
     while(SDL_PollEvent(&event)) {
@@ -130,7 +130,7 @@ int main(int argv, char** args) {
     while(running) {
         Uint32 curTime = SDL_GetTicks();
         if(curTime - lastUpd >= 16) {
-            handleQuit(running, _mouse);
+            handleInput(running, _mouse);
 
             _renderer->clearScreen(0xFF000816);
 
