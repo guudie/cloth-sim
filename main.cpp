@@ -130,7 +130,7 @@ int main(int argv, char** args) {
     Uint32 lastUpd = SDL_GetTicks();
     while(running) {
         Uint32 curTime = SDL_GetTicks();
-        if(curTime - lastUpd >= 1000.0f / 60.0f) {
+        if(curTime - lastUpd >= 16) {
             handleQuit(running, _mouse);
 
             _renderer->clearScreen(0xFF000816);
