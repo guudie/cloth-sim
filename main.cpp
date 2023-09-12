@@ -149,7 +149,7 @@ int main(int argv, char** args) {
                 if(p->locked)
                     continue;
                 
-                _integrator.Integrate(p->pos, p->vel, p->acc, 1);
+                _integrator.integrate(p->pos, p->vel, p->acc, 1);
                 // resolveVelocity(p->pos, p->vel, height);
 
                 glm::vec2 tmp = p->pos - _mouse->getPos();
