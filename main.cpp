@@ -127,84 +127,89 @@ int main(int argv, char** args) {
 
     point* followMouse = nullptr;
 
+    Uint32 lastUpd = SDL_GetTicks();
     while(running) {
-        handleQuit(running, _mouse);
+        Uint32 curTime = SDL_GetTicks();
+        if(curTime - lastUpd >= 1000.0f / 60.0f) {
+            handleQuit(running, _mouse);
 
-        _renderer->clearScreen(0xFF000816);
+            _renderer->clearScreen(0xFF000816);
 
-        for(auto& p : points) {
-            if(p == followMouse) {
-                if(!_mouse->getLB()) {
-                    followMouse = nullptr;
-                    p->locked = false;
-                    p->vel = _mouse->getDiff();
-                    p->acc = { 0, 0.5f };
-                } else {
-                    p->pos = _mouse->getPos();
+            for(auto& p : points) {
+                if(p == followMouse) {
+                    if(!_mouse->getLB()) {
+                        followMouse = nullptr;
+                        p->locked = false;
+                        p->vel = _mouse->getDiff();
+                        p->acc = { 0, 0.5f };
+                    } else {
+                        p->pos = _mouse->getPos();
+                    }
+                }
+
+                if(p->locked)
+                    continue;
+                
+                _integrator.Integrate(p->pos, p->vel, p->acc, 1);
+                // resolveVelocity(p->pos, p->vel, height);
+
+                glm::vec2 tmp = p->pos - _mouse->getPos();
+                if(glm::dot(tmp, tmp) < radiussquared && followMouse == nullptr) {
+                    if(_mouse->getLB()) {
+                        p->locked = true;
+                        p->vel = { 0, 0 };
+                        p->acc = { 0, 0 };
+                        followMouse = p;
+                    } else if(_mouse->getSBX2()) {
+                        p->pos += _mouse->getDiff();
+                        p->vel += _mouse->getDiff();
+                    }
                 }
             }
 
-            if(p->locked)
-                continue;
-            
-            _integrator.Integrate(p->pos, p->vel, p->acc, 1);
-            // resolveVelocity(p->pos, p->vel, height);
-
-            glm::vec2 tmp = p->pos - _mouse->getPos();
-            if(glm::dot(tmp, tmp) < radiussquared && followMouse == nullptr) {
-                if(_mouse->getLB()) {
-                    p->locked = true;
-                    p->vel = { 0, 0 };
-                    p->acc = { 0, 0 };
-                    followMouse = p;
-                } else if(_mouse->getSBX2()) {
-                    p->pos += _mouse->getDiff();
-                    p->vel += _mouse->getDiff();
-                }
+            if(_mouse->getLB() && followMouse == nullptr) {
+                _mouse->setLB(false);
             }
-        }
 
-        if(_mouse->getLB() && followMouse == nullptr) {
-            _mouse->setLB(false);
-        }
+            for(int i = 0; i < 3; i++) {
+                for(const auto& stick : sticks) {
+                    if(stick == nullptr)
+                        continue;
+                    constrainLength(stick->p_ptr, stick->q_ptr, stick->len, elasticity);
+                }
+                for(auto& p : points)
+                    resolveOutOfBounds(*p, width, height);
+            }
 
-        for(int i = 0; i < 3; i++) {
-            for(const auto& stick : sticks) {
+            // for(const auto& stick : sticks) {
+            //     if(stick == nullptr)
+            //         continue;
+            //     for(int i = 0; i < 3; i++) {
+            //         constrainLength(stick->p_ptr, stick->q_ptr, stick->len, elasticity);
+            //         resolveOutOfBounds(*stick->p_ptr, width, height);
+            //         resolveOutOfBounds(*stick->q_ptr, width, height);
+            //     }
+            // }
+
+            for(auto& stick : sticks) {
                 if(stick == nullptr)
                     continue;
-                constrainLength(stick->p_ptr, stick->q_ptr, stick->len, elasticity);
-            }
-            for(auto& p : points)
-                resolveOutOfBounds(*p, width, height);
-        }
-
-        // for(const auto& stick : sticks) {
-        //     if(stick == nullptr)
-        //         continue;
-        //     for(int i = 0; i < 3; i++) {
-        //         constrainLength(stick->p_ptr, stick->q_ptr, stick->len, elasticity);
-        //         resolveOutOfBounds(*stick->p_ptr, width, height);
-        //         resolveOutOfBounds(*stick->q_ptr, width, height);
-        //     }
-        // }
-
-        for(auto& stick : sticks) {
-            if(stick == nullptr)
-                continue;
-            if(_mouse->getRB()) [[unlikely]] {
-                glm::vec2 tmp = (stick->p_ptr->pos + stick->q_ptr->pos) / 2.0f - _mouse->getPos();
-                if(glm::dot(tmp, tmp) < radiussquared / 16.0f) {
-                    delete stick;
-                    stick = nullptr;
-                    continue;
+                if(_mouse->getRB()) [[unlikely]] {
+                    glm::vec2 tmp = (stick->p_ptr->pos + stick->q_ptr->pos) / 2.0f - _mouse->getPos();
+                    if(glm::dot(tmp, tmp) < radiussquared / 16.0f) {
+                        delete stick;
+                        stick = nullptr;
+                        continue;
+                    }
                 }
+                _renderer->drawLine(stick->p_ptr->pos, stick->q_ptr->pos, 0xFFFFFFFF);
             }
-            _renderer->drawLine(stick->p_ptr->pos, stick->q_ptr->pos, 0xFFFFFFFF);
+
+            _renderer->render();
+
+            // SDL_Delay(1000 / 60);
+            lastUpd = curTime;
         }
-
-        _renderer->render();
-
-        // SDL_Delay(1000 / 60);
     }
 
     std::cout << "Quit program" << std::endl;
