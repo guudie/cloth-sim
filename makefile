@@ -1,12 +1,16 @@
 .PHONY: all app temp clean subdirs
 
+EXT =
+ifeq ($(OS), Windows_NT)
+	EXT = .exe
+endif
 SUBDIRS = ODE_solvers
 ARGS = -O2
 GCC = g++
 
 CFLAGS = -O2 -Wall -mconsole -lm `sdl2-config --libs --cflags`
 
-all: subdirs renderer.o mouse.o main.o app
+all: subdirs renderer.o mouse.o main.o app$(EXT)
 clean:
 	-rm *.o *.exe; \
 	for dir in $(SUBDIRS); do \
@@ -27,5 +31,5 @@ mouse.o: mouse.h mouse.cpp
 main.o: main.cpp application.h renderer.h mouse.h utils.h ./ODE_solvers/velocityVerlet.h ./ODE_solvers/ODESolver.h
 	$(GCC) $(ARGS) -c main.cpp -o main.o
 
-app: main.o renderer.o mouse.o ./ODE_solvers/ode_joined.o
+app$(EXT): main.o renderer.o mouse.o ./ODE_solvers/ode_joined.o
 	$(GCC) -o $@ $^ $(CFLAGS)
