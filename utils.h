@@ -19,13 +19,14 @@ void parseData(const std::string& path, std::vector<point*>& points, std::vector
     std::fstream fin(path, std::ios::in);
     int r, c;
     fin >> r >> c;
+    points.reserve(r * c);
     for(int y = 0; y < r; y++) {
         for(int x = 0; x < c; x++) {
             float cx, cy;
             bool locked;
             fin >> cx >> cy >> locked;
             point* p = new point { glm::vec2(cx, cy), glm::vec2((rand() % 21) * (!locked), 0), glm::vec2(0, 0.5f * (!locked)), locked };
-            points.push_back(p);
+            points.emplace_back(p);
             if(x > 0) {
                 point* tmp = points[y * c + x - 1];
                 sticks.push_back(new segment { p, tmp, glm::length(p->pos - tmp->pos) });
