@@ -2,8 +2,8 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <glm/glm.hpp>
-#include <glm/gtx/string_cast.hpp>
+#include "glm/glm.hpp"
+#include "glm/gtx/string_cast.hpp"
 #include <SDL2/SDL.h>
 #include "renderer.h"
 #include "mouse.h"

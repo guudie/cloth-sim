@@ -2,7 +2,6 @@
 * `GNU make`
 * Python 3.x
 * `g++` compiler with the following libraries installed
-  * `glm` ([github](https://github.com/g-truc/glm)), which provides vector computation functionality
   * `SDL2` ([libsdl.org](https://www.libsdl.org/)), which provides rendering functionality
 
 ### Build and run
