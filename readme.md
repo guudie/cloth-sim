@@ -1,6 +1,6 @@
 ### Requirements
 * `GNU make`
-* Python 3.x
+* Python 3.x (to generate test data)
 * `g++` compiler with the following libraries installed
   * `SDL2` ([libsdl.org](https://www.libsdl.org/)), which provides rendering functionality
 
