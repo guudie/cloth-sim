@@ -1,14 +1,16 @@
 .PHONY: all app temp clean subdirs
 
 EXT =
+WINOPT = 
 ifeq ($(OS), Windows_NT)
 	EXT = .exe
+	WINOPT = -mconsole
 endif
 SUBDIRS = ODE_solvers
 ARGS = -O2
 GCC = g++
 
-CFLAGS = -O2 -Wall -mconsole -lm `sdl2-config --libs --cflags`
+CFLAGS = $(WINOPT) -O2 -Wall -lm `sdl2-config --libs --cflags`
 
 all: subdirs utils.o renderer.o mouse.o cloth.o application.o main.o app$(EXT)
 clean:
