@@ -2,9 +2,9 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <SDL2/SDL.h>
 #include "glm/glm.hpp"
 #include "glm/gtx/string_cast.hpp"
-#include <SDL2/SDL.h>
 #include "application.h"
 #include "ODE_solvers/velocityVerlet.h"
 
