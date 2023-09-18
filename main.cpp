@@ -32,7 +32,7 @@ int main(int argv, char** args) {
         app->input();
 
         try {
-            app->update(width, height);
+            app->update();
         } catch (std::string err) {
             std::cout << err << std::endl;
             break;
@@ -41,10 +41,11 @@ int main(int argv, char** args) {
         app->render();
     }
 
-    std::cout << "Quit program" << std::endl;
-
+    app->destroy();
     delete app;
     delete _integrator;
+
+    std::cout << "Quit program" << std::endl;
 
     return 0;
 }

@@ -68,37 +68,41 @@ void application::input() {
     }
 }
 
-void application::updateNoTick(int width, int height) {
+void application::updateNoTick() {
     currentTime = SDL_GetTicks();
     float dt = (currentTime - lastUpdateTime) * 60.0f / 1000.0f;    // dt is the ratio of actual deltatime to 16.6ms (60 FPS)
 
-    _cloth->update(_mouse, width, height, dt);
+    _cloth->update(_mouse, _renderer->getWidth(), _renderer->getHeight(), dt);
     
     lastUpdateTime = currentTime;
 }
 
-void application::updateWithTick(int width, int height) {
+void application::updateWithTick() {
     currentTime = SDL_GetTicks();
     if(currentTime - lastUpdateTime >= tickDuration) {
-        _cloth->update(_mouse, width, height);
+        _cloth->update(_mouse, _renderer->getWidth(), _renderer->getHeight());
     
         lastUpdateTime = currentTime;
+        updatedThisTick = true;
     }
 }
 
-void application::update(int width, int height) {
+void application::update() {
     if(updateEveryTick)
-        updateWithTick(width, height);
+        updateWithTick();
     else
-        updateNoTick(width, height);
+        updateNoTick();
 }
 
-void application::render() const {
+void application::render() {
+    if(updateEveryTick && !updatedThisTick)
+        return;
     _renderer->clearScreen(0xFF000816);
 
     _cloth->drawAllSticks(_renderer);
 
     _renderer->render();
+    updatedThisTick = false;
 }
 
 bool application::isRunning() const {

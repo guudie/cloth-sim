@@ -15,6 +15,7 @@ private:
 
     bool running = false;
     bool updateEveryTick;
+    bool updatedThisTick = false;
 
     Uint32 lastUpdateTime;
     Uint32 currentTime;
@@ -33,9 +34,9 @@ public:
 
     void setupFromPath(int windowWidth, int windowHeight, std::string path, ODESolver* _integrator);
     void input();
-    void updateNoTick(int width, int height);
-    void updateWithTick(int width, int height);
-    void update(int width, int height);
-    void render() const;
+    void updateNoTick();
+    void updateWithTick();
+    void update();
+    void render();
     void destroy();
 };

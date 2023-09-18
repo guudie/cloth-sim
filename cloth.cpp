@@ -142,9 +142,6 @@ void cloth::update(mouse* _mouse, int width, int height, float dt) {
                 continue;
             }
         }
-        if(isnan(stick->p_ptr->pos.x) || isnan(stick->p_ptr->pos.y) || isnan(stick->q_ptr->pos.x) || isnan(stick->q_ptr->pos.y)) {
-            throw "Error: Nan encountered in position";
-        }
     }
 }
 
@@ -154,6 +151,9 @@ void cloth::drawAllPoints(renderer* _renderer) {
 
 void cloth::drawAllSticks(renderer* _renderer) {
     for(auto& stick : sticks)
-        if(stick != nullptr)
+        if(stick != nullptr) {
+            if(isnan(stick->p_ptr->pos.x) || isnan(stick->p_ptr->pos.y) || isnan(stick->q_ptr->pos.x) || isnan(stick->q_ptr->pos.y))
+                throw "Error: Nan encountered in position";
             _renderer->drawLine(stick->p_ptr->pos, stick->q_ptr->pos, 0xFFFFFFFF);
+        }
 }
