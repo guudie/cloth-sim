@@ -13,7 +13,7 @@ Before running the file, generate data by running `py generate_tests.py` to get 
 Run `app`.
 
 ### Prebuilt executable (for windows)
-If building the program yourself is not an option, you can unzip `application.zip`, which contains the executable itself (`app.exe`), and a dynamic link library (`SDL2.dll`) required for it to run. Note that if you decide to build it yourself, you won't need the dll as it will be linked statically.
+If building the program yourself is not an option, you can unzip `application.zip`, which contains the executable itself (`app.exe`), and a dynamic link library (`SDL2.dll`) required for it to run. There is also a pre-generated `data.txt` file. Note that if you decide to build it yourself, you won't need the dll as it will be linked statically.
 
 ### Interactions
 Move the cursor close to a point (particle) in the cloth, click and hold left mouse button to pick up a particle near the position of the mouse, drag the mouse while holding to see effect.
