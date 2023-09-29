@@ -1,5 +1,5 @@
 ### Requirements
-For windows users, you can skip this section (**Requirements**) and the next one (**Build and run**) and just unzip the `application.zip` folder if you just want a working executable. Otherwise, if you prefer to build it yourself, here are the requirements:
+For windows users, you can skip this section (**Requirements**) and the next one (**Build and run**) and just unzip the `application.zip` file if you just want a working executable. Otherwise, if you prefer to build it yourself, here are the requirements:
 * `GNU make`
 * Python 3.x (to generate test data)
 * `g++` compiler with the following libraries installed
