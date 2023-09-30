@@ -10,7 +10,7 @@ SUBDIRS = ODE_solvers
 ARGS = -O2
 GCC = g++
 
-CFLAGS = $(WINOPT) -O2 -Wall -lm `sdl2-config --libs --cflags`
+CFLAGS = $(WINOPT) -O2 -Wall -lm `sdl2-config --static-libs --cflags`
 
 all: subdirs utils.o renderer.o mouse.o cloth.o application.o main.o app$(EXT)
 clean:
