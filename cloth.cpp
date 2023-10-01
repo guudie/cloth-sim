@@ -2,6 +2,7 @@
 #include "renderer.h"
 #include "ODE_solvers/ODESolver.h"
 #include "mouse.h"
+#include "utils.h"
 #include <fstream>
 #include <math.h>
 

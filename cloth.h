@@ -1,7 +1,9 @@
 #pragma once
 #include <iostream>
 #include <vector>
-#include "utils.h"
+
+struct point;
+struct segment;
 
 class renderer;
 class ODESolver;
