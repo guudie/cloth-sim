@@ -2,15 +2,23 @@
 
 EXT =
 WINOPT = 
+DEBUGCONSOLE = true
 ifeq ($(OS), Windows_NT)
 	EXT = .exe
-	WINOPT = -mconsole
+	ifeq ($(DEBUGCONSOLE), true)
+		WINOPT = -mconsole
+	endif
 endif
 SUBDIRS = ODE_solvers
 ARGS = -O2
 GCC = g++
 
-CFLAGS = $(WINOPT) -O2 -Wall -lm `sdl2-config --static-libs --cflags`
+LIBS = `sdl2-config --libs --cflags`
+STATICLINK = false
+ifeq ($(STATICLINK), true)
+	LIBS = `sdl2-config --static-libs --cflags` --static
+endif
+CFLAGS = $(WINOPT) -O2 -Wall -lm $(LIBS)
 
 all: subdirs utils.o renderer.o mouse.o cloth.o application.o main.o app$(EXT)
 clean:
