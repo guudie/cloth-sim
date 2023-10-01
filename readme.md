@@ -2,7 +2,7 @@
 For windows users, you can skip this section (**Requirements**) and the next one (**Build and run**) and just unzip the `application.zip` file if you just want a working executable. Otherwise, if you prefer to build it yourself, here are the requirements:
 * GNU make
 * Python 3.x (to generate test data)
-* MingW64 (on Windows, [msys2.org](https://www.msys2.org/))
+* MinGW64 (for Windows, [msys2.org](https://www.msys2.org/))
 * `g++` compiler and the following libraries installed
   * `SDL2` ([libsdl.org](https://www.libsdl.org/)), which provides rendering functionality
 
